@@ -3,6 +3,7 @@
 import os
 from typing import Dict, Callable, Optional, Union, Tuple
 
+import torch
 import numpy as np
 import pandas as pd
 import albumentations as albu
@@ -34,7 +35,8 @@ class ImageDataset(Dataset):
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(image, dsize=self.image_size)
+        # image = image[:, :, ::-1]  # COLOR_BGR2RGB
+        image = cv2.resize(image, self.image_size)
 
         return image
 
@@ -77,6 +79,8 @@ class ImageDataset(Dataset):
             image = self.augmentations(image)['image']
         else:
             image = self.__normalize_image__(image)['image']
+
+        image_label = torch.tensor(image_label)
 
         dataset_element = {
             'image': image,
