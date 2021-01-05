@@ -1,8 +1,11 @@
 """Modules with testing"""
 
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from modules.data.dataset import ImageDataset
+from modules.data.augs import train_augmentations, valid_augmentations
+from modules.data.utils import tensor_to_numpy, numpy_to_tensor
 from modules.utils import load_config
 
 if __name__ == '__main__':
@@ -14,8 +17,17 @@ if __name__ == '__main__':
 
     train_dataframe = pd.read_csv(train_dataframe_path)
 
-    image_dataset = ImageDataset(dataframe=train_dataframe, images_path=train_images_path)
+    image_dataset = ImageDataset(dataframe=train_dataframe,
+                                 images_path=train_images_path,
+                                 augmentations=train_augmentations)
 
     res = image_dataset[0]
 
     print(res)
+
+    image = res['image']
+
+    image = tensor_to_numpy(image)
+
+    plt.imshow(image)
+    plt.show()

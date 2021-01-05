@@ -1,7 +1,7 @@
 """Module with dataset class"""
 
 import os
-from typing import Dict, Callable, Optional, Union
+from typing import Dict, Callable, Optional, Union, Tuple
 
 import numpy as np
 import pandas as pd
@@ -15,14 +15,16 @@ class ImageDataset(Dataset):
     """Dataset class"""
 
     def __init__(self, dataframe: pd.DataFrame, images_path: str,
-                 augmentations: Optional[Callable] = None):
+                 augmentations: Optional[Callable] = None,
+                 image_size: Tuple[int, int] = (256, 256)):
         self.dataframe = dataframe
 
         self.images_path = images_path
         self.augmentations = augmentations
 
-    @staticmethod
-    def __load_image__(image_path: str) -> np.ndarray:
+        self.image_size = image_size
+
+    def __load_image__(self, image_path: str) -> np.ndarray:
         """
         Loads image from disk
 
@@ -32,6 +34,7 @@ class ImageDataset(Dataset):
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, dsize=self.image_size)
 
         return image
 
