@@ -18,7 +18,13 @@ class CassavaNet(torch.nn.Module):
         super().__init__()
 
         backbone = timm.create_model(model_type, pretrained=pretrained)
-        n_features = backbone.fc.in_features
+
+        if 'resnet' in model_type:
+            n_features = backbone.fc.in_features
+        elif 'eff' in model_type:
+            n_features = backbone.classifier.in_features
+        else:
+            raise NotImplementedError(f'No num_features for this network type')
 
         self.backbone = torch.nn.Sequential(*backbone.children())[:-2]
         self.classifier = torch.nn.Linear(n_features, 5)

@@ -19,13 +19,16 @@ if __name__ == '__main__':
     train_images_path = config.get('Data', 'train_images_path')
     train_dataframe_path = config.get('Data', 'train_dataframe_path')
 
+    weights_dir = config.get('Model', 'weights_path')
+    device = config.get('Model', 'device')
+    model_type = config.get('Model', 'model_type')
     image_size = tuple(json.loads(config.get('Model', 'image_size')))
     valid_size = config.getfloat('Model', 'valid_size')
     batch_size = config.getint('Model', 'batch_size')
-    device = config.get('Model', 'device')
     learning_rate = config.getfloat('Model', 'learning_rate')
 
     train_dataframe = pd.read_csv(train_dataframe_path)
+    # train_dataframe = train_dataframe.sample(frac=0.1)
 
     train_dataset, valid_dataset = split_dataset(
         dataframe=train_dataframe,
@@ -39,15 +42,17 @@ if __name__ == '__main__':
     train_dataloader = create_dataloader(dataset=train_dataset, batch_size=batch_size)
     valid_dataloader = create_dataloader(dataset=valid_dataset, batch_size=batch_size)
 
-    model = CassavaNet(model_type='resnet18', pretrained=True)
+    model = CassavaNet(model_type=model_type, pretrained=True)
 
     optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
     loss_func = torch.nn.CrossEntropyLoss()
 
     train_model(model=model,
-                num_epochs=15,
+                num_epochs=50,
                 optimizer=optimizer,
                 loss_func=loss_func,
                 train_dataloader=train_dataloader,
-                valid_dataloader=valid_dataloader)
+                valid_dataloader=valid_dataloader,
+                device=device,
+                weights_dir=weights_dir)
 
