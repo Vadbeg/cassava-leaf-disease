@@ -8,6 +8,7 @@ from collections import defaultdict
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+from colorama import Fore
 
 from modules.utils import load_config
 
@@ -92,6 +93,15 @@ def build_plots(report: Dict[str, List[float]]):
     plt.show()
 
 
+def print_report(report: Dict[str, List[float]]):
+    index = report['valid_loss'].index(min(report['valid_loss']))
+
+    print(f'Best epoch: {Fore.YELLOW}{index}{Fore.RESET}')
+
+    for metric_name, metric_values in report.items():
+        print(f'{metric_name}: {Fore.YELLOW}{metric_values[index]}{Fore.RESET}')
+
+
 if __name__ == '__main__':
     config_path = '/home/vadbeg/Projects/Kaggle/cassava-leaf-disease/config.ini'
     config = load_config(config_path=config_path)
@@ -103,4 +113,6 @@ if __name__ == '__main__':
     report_path = os.path.join(reports_folder, report_name)
     metrics_dict = parse_report(report_path=report_path)
 
+    print_report(report=metrics_dict)
     build_plots(report=metrics_dict)
+
